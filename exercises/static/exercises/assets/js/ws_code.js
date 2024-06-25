@@ -11,7 +11,7 @@ var frequency = "0";
 var websocket_code;
 function declare_code(websocket_address){
     websocket_code = new WebSocket("ws://" + websocket_address + ":1905/");
-	 console.log("send codeeeeeeeee");
+
     websocket_code.onopen = function(event){
 		radiConect.contentWindow.postMessage({connection: 'exercise', command: 'launch_level', level: '5'}, '*');
 		if (websocket_gui.readyState == 1) {
