@@ -10,6 +10,7 @@ function startSim(step) {
     let websockets_connected = false;
     if (step == 0) {
         ws_manager = new WebSocket("ws://" + websocket_address + ":8765/");
+		 console.log("send codeeeeeeeee 1");
     }
     else if (step == 1) {
         radiConect.contentWindow.postMessage({connection: 'exercise', command: 'launch_level', level: `${level}`}, '*');
