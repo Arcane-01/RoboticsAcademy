@@ -25,6 +25,7 @@ WorldType = (
     ('none', "None"),
     ('gazebo', "Gazebo"),
     ('drones', "Gazebo Drones"),
+    ('gzsim', "Gz Sim"),
     ('physical', "Physical")
 )
 
