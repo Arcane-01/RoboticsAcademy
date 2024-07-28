@@ -15,7 +15,7 @@ if not rclpy.ok():
 IMG_WIDTH = 320
 IMG_HEIGHT = 240
 
-CAM_FRONTAL_TOPIC = "/" + "drone0" + "/sensor_measurements/front_camera/image_raw"
+CAM_FRONTAL_TOPIC = "/" + "drone0" + "/sensor_measurements/frontal_camera/image_raw"
 CAM_VENTRAL_TOPIC = "/" + "drone0" + "/sensor_measurements/ventral_camera/image_raw"
 
 drone = DroneWrapper()
