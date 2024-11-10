@@ -1,26 +1,40 @@
 version: '3.8'
 
 services:
+  my-postgres:
+    image: postgres:latest
+    container_name: universe_db
+    environment:
+      POSTGRES_DB: academy_db 
+      POSTGRES_USER: user-dev 
+      POSTGRES_PASSWORD: robotics-academy-dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./RoboticsInfrastructure/database/universes.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./database/exercises/db.sql:/docker-entrypoint-initdb.d/2.sql
+      - ./database/django_auth.sql:/docker-entrypoint-initdb.d/3.sql
+      - ./scripts:/scripts
+    healthcheck:
+      test: pg_isready -U user-dev -d academy_db
+      interval: 1s
+      timeout: 1s
+      retries: 20
+
   robotics-academy:
-    image: jderobot/robotics-academy:4.5.9
-    container_name: user_container
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
-    # devices:
-    #   - /dev/dri/card0:/dev/dri/card0
-    #   - /dev/dri/renderD128:/dev/dri/renderD128
+    image: jderobot/robotics-backend:test
+    container_name: developer-container
     ports:
       - "7164:7164"
-      - "2303:2303"
-      - "1905:1905"
-      - "8765:8765"
+      - "7163:7163"
       - "6080:6080"
       - "1108:1108"
-      - "7163:7163"
+    volumes:
+      - type: bind
+        source: ./
+        target: /RoboticsAcademy
     tty: true
     stdin_open: true
+    depends_on: 
+      my-postgres:
+        condition: service_healthy

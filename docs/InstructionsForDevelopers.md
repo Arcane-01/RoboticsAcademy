@@ -5,6 +5,7 @@
 # Instructions for developers
 - [Getting started with Robotics Academy for developers](https://youtu.be/3AM-ztcRsr4) 
 - [How to setup the developer environment](#How-to-setup-the-developer-environment)
+- [How to use nvidia](#How-to-use-nvidia)
 - [How to add a new exercise](#How-to-add-a-new-exercise)
 - [How to update static files version](#How-to-update-static-files-version)
 - [Steps to change models from CustomRobots in RoboticsAcademy exercises](#Steps-to-change-models-from-CustomRobots-in-RoboticsAcademy-exercises)
@@ -33,8 +34,16 @@ You can ignore the -b arg if you want to start working from the main branch.
 sh scripts/develop_academy.sh -r <link to the RAM repo/fork> -b <branch of the RAM repo> -i <humble/noetic>
 ```
 If you don't provide any arguments, it will prepare a humble environment with the current stable branch of RAM. You may start working from that and then create the branch you need. 
-
 You may access RA frontend at [http://127.0.0.1:7164/exercises/](http://127.0.0.1:7164/exercises/) 
+
+
+\
+If you need more information about the options available for launching the script, you can use:
+```
+sh scripts/develop_academy.sh -h
+```
+Which will display a help message.
+
 
 3) Developing procedure
 
@@ -52,11 +61,28 @@ Please look at the attached image for reference.
 
 <img width="1440" alt="Screenshot 2024-05-01 at 10 35 55 PM" src="https://github.com/JdeRobot/RoboticsAcademy/assets/57873504/c4096ab4-f9c1-4ddf-b612-41e78074fb99">
 
+### Some problems that can arise
 
+It is possible that the first time you follow the instructions, a dependency may not be installed correctly, or it may not be added to the path for some reason.
+
+One of the most frequent problems is that the frontend doesn't launch, you can solve it in two ways, the first one is to launch the frontend separately from another terminal:
+
+```
+cd /RoboticsAcademy
+```
+
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+nvm install 17
+nvm use 17
+cd react_frontend/ && yarn install && yarn run dev
+```
+
+Another way to solve it is to try to delete the generated image and do it again, you can follow the instructions in: [How to generate a radi](https://github.com/JdeRobot/RoboticsAcademy/blob/humble-devel/docs/generate_a_radi.md).
 
 ### Using Docker compose
 
-Docker Compose is a tool for defining and running multi-container applications. It is the key to unlocking a streamlined and efficient development and deployment experience. Compose makes easy to manage services, networks, and volumes in a single, comprehensible YAML configuration file. Then, with a single command, you create and start all the services from your configuration file. In this YAML file we provide all the configurations needed for a smooth development experience, mainly ports and volumes. This method works by binding your local folder to the appropiate place inside a RADI container, where all the dependencies are installed. 
+Docker Compose is a tool for defining and running multi-container applications. It is the key to unlocking a streamlined and efficient development and deployment experience. Compose makes easy to manage services, networks, and volumes in a single, comprehensible YAML configuration file. Then, with a single command, you create and start all the services from your configuration file. In this YAML file we provide all the configurations needed for a smooth development experience, mainly ports and volumes. This method works by binding your local folder to the appropiate place inside a RoboticsBackend container, where all the dependencies are installed. 
 
 The steps for setting up a development environment using Docker Compose are:
 
@@ -82,8 +108,8 @@ For the moment, the RAM folder MUST be called src, and the previous command take
 
 ```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-nvm install 16
-nvm use 16
+nvm install 17
+nvm use 17
 cd react_frontend/ && yarn install && yarn run dev
 ```
 
@@ -101,7 +127,7 @@ Feel free to study the configs, and adapt/create new ones suitable for your need
 docker-compose up
 ```
 
-Now you can open the RoboticsAcademy folder in your preferred code editor and test the changes inside the docker without having to regenerate a new image. Please keep in mind that this method works using a given RADI version as the base. The only difference for developing between RADI versions is the ROS version (humble or noetic) and the branch of RoboticsInfrastructure. If you need to make changes in RI, we recommend that you follow [this procedure](##edit-code-on-RADI-on-the-go).
+Now you can open the RoboticsAcademy folder in your preferred code editor and test the changes inside the docker without having to regenerate a new image. Please keep in mind that this method works using a given RoboticsBackend version as the base. The only difference for developing between RoboticsBackend versions is the ROS version (humble or noetic) and the branch of RoboticsInfrastructure. If you need to make changes in RI, we recommend that you follow [this procedure](##edit-code-on-RoboticsBackend-on-the-go).
 
 After testing the changes, you can simply commit them from the RA repo. Please keep in mind that the changes in RAM inside the src folder won't be commited, as they are not part of RoboticsAcademy. To commit those changes, just get inside the src/ folder and work from there (remember, this is the RAM repo with another name).
 
@@ -109,18 +135,106 @@ After testing the changes, you can simply commit them from the RA repo. Please k
 ```
 docker-compose down
 ```
-When you finish developing, you can close the container with Ctrl+C, but after that, you must clean the environment executing the previous command, otherwise, some things may not work in the next execution.  
+When you finish developing, you can close the container with Ctrl+C, but after that, you must clean the environment executing the previous command, otherwise, some things may not work in the next execution. 
+
+**Note: How to update Robotics Academy local deployment with Node 17 and sass** 
+
+Robotics Academy has been updated to use Node 17 and sass. If you have a Robotics Academy local deployment and you don't want to make a new one, you can follow the next instructions to update your local deployment in order to use both dependencies: 
+
+1) Go into RoboticsAcademy folder
+```
+cd RoboticsAcademy/ 
+ ```
+2) Pull the new changes from Robotics Academy humble-devel branch into your local branch
+3) Install and use Node 17
+ ```
+nvm install 17
+nvm use 17
+ ```
+4) Reinstall yarn and rebuild the REACT frontend
+ ```
+cd react_frontend/
+yarn install
+yarn run dev
+ ```
+Now, you can continue using your local deployment with Node 17 and sass. 
+
+**Note:** If you have problems during this process, use the following command before installing Node 17: 
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash 
+ ```
+
+**Note:** This steps are not necessary if you deploy Robotics Academy in developer mode using an automatic script. When the script is executed, it internally runs the commands. 
+
+
+<a name="How-to-use-nvidia"></a>
+## How to use nvidia
+
+When launching the developer script you can use the options `-g` to use the integrated graphics card or `-n` to use the nvidia graphics card. Before you start, make sure you have the [NVIDIA Container Toolkit installed](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+
+Now we will have to install the nvidia runtime to use it with our docker:
+```bash
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2
+```
+
+Now we will check if docker recognises nvidia as a new runtime (restarting the docker service to update the new configuration):
+
+```bash
+sudo systemctl restart docker
+docker info | grep -i runtime
+```
+
+It will most likely not recognise it, so we will have to do it manually by editing or creating the `/etc/docker/daemon.json` file:
+
+```json
+{
+  "runtimes": {
+    "nvidia": {
+      "path": "nvidia-container-runtime",
+      "runtimeArgs": []
+    }
+  }
+}
+```
+It is also possible that nvidia-runtime is not installed, check and install it if it is not.
+
+```bash
+dpkg -l | grep nvidia-container-runtime
+```
+
+If it is not installed:
+
+```bash
+sudo apt-get install -y nvidia-container-runtime
+```
+
+Now everything should be ready to start using nvidia with our dockers, restart the docker service to update the configuration and check that everything works correctly.
+
+```bash
+sudo systemctl restart docker
+```
+
 
 <a name="How-to-add-a-new-exercise"></a>
 ## How to add a new exercise
 To include a new exercise, add the folder with the exercise contents in exercises/static/exercises following the file name conventions:
-- ```entry_point/ros_version```: used for the entrypoint of an exercise run by the RAM
-- ```launch/ros_version```: used for world launch files (.launch)
 - ```python_template/ros_version```: used for the python templates needed to compose the user code
 - ```react-components```: exercise specific react components
 
+There are a three python packages to help the development of a new exercise:
+- [Hal Interfaces][]: provides the hardware abstraction layer for various components
+- [Gui Interfaces][]: provides with various base GUI's for easy development
+- [Console Interfaces][]: provides control of the console
+
+[Hal Interfaces]: ../common/hal_interfaces/README.md
+[Gui Interfaces]: ../common/gui_interfaces/README.md
+[Console Interfaces]: ../common/console_interfaces/README.md
+
+For knowing how to use each package, please follow the links in the list above.
+
 Then, create the entry in db.sqlite3. A simple way to do this is by using the Django admin page:
-1)  Run ```python3.8 manage.py runserver```.
+1)  Run ```python3.8 manage.py runserver``` or launch the docker as normal.
 2)  Access http://127.0.0.1:7164/admin/ on a browser and log in with "user" and "pass".
 3)  Click on "add exercise" and fill the required fields specified below. Save and exit.
 4)  Commit db.sqlite3 changes.
@@ -129,7 +243,7 @@ An exercise entry in the database must include the following data:
 - ```exercise id```: unique exercise identifier, must match the folder name
 - ```name```: name to display on the exercise list
 - ```description```: description to display on the exercise list
-- ```tags```: an exercise must include at least one ROS tag ("ROS1" or "ROS2"). The exercise will only be shown on the exercise list when the RADI ROS version installed is listed in the tags. Tags are also used by the search bar.
+- ```tags```: an exercise must include at least one ROS tag ("ROS1" or "ROS2"). The exercise will only be shown on the exercise list when the RoboticsBackend ROS version installed is listed in the tags. Tags are also used by the search bar.
 - ```state```: changes the state indicator (active = green; prototype = yellow; inactive = red)
 - ```language```: programming language used
 - ```configuration```: available launch options to run the exercise written in JSON. If the generic react components are used, the exercise frontend will automatically request to launch the exercise using the first configuration that matches the key ROSX (X = ROS version detected by django). If the generic circuit selector react component is used, it will automatically display all the launch options items of the array that matches the key ROSX (X = ROS version detected by django), displaying the name stored under the key "name". Sample configuration JSON including 2 launch options for ROS1 and 1 launch option for ROS2:
@@ -288,8 +402,8 @@ For example: ```script src="{% static 'exercises/assets/js/utils.js``` would hav
 - You need to change the launcher.js file in the case that the exercise has a map selector or not.
 - Finally, if the exercise need an specific plugin that isn't installed in the container you need to modify the [Dockerfile](https://github.com/JdeRobot/RoboticsAcademy/blob/master/scripts/Dockerfile) an add the commands that allows the installation of the .cc and .hh files of the CustomRobots repository.
 
-<a name="edit-code-on-RADI-on-the-go"></a>
-## Edit code on RADI On The GO.
+<a name="edit-code-on-RoboticsBackend-on-the-go"></a>
+## Edit code on RoboticsBackend On The GO.
 
 1. If your IDE of choice is VSCode then this method is for you, visit [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) to download the extenstion.
 
@@ -301,17 +415,17 @@ For example: ```script src="{% static 'exercises/assets/js/utils.js``` would hav
    
    <img width="597" alt="remote-command-palette" src="https://user-images.githubusercontent.com/58532023/184609609-eb1c1a15-9666-46f9-bc9d-df099d3738b8.png">
 
-## How to add your local changes to RADI while persisting changes two-way
+## How to add your local changes to RoboticsBackend while persisting changes two-way
 
-1. This method is for you if you have worked your way till now in your local setup and looking to import all changes inside RADI while also being able to edit and persist further changes.
+1. This method is for you if you have worked your way till now in your local setup and looking to import all changes inside RoboticsBackend while also being able to edit and persist further changes.
 
 2. On Terminal open the directory where your project or code is located at (Example:- ```cd ~/my_project```)
 
-3. Append ```-v $(pwd):/location_in_radi``` to your ```docker run``` cli command used to run your container. (Example:- ```docker run --rm -it -p 7164:7164 -p 2303:2303 -p 1905:1905 -p 8765:8765 -p 6080:6080 -p 1108:1108 -v $(pwd):/home jderobot/robotics-academy```)
+3. Append ```-v $(pwd):/location_in_radi``` to your ```docker run``` cli command used to run your container. (Example:- ```docker run --rm -it $(nvidia-smi >/dev/null 2>&1 && echo "--gpus all" || echo "") --device /dev/dri -p 7164:7164 -p 6080:6080 -p 1108:1108 -p 7163:7163 jderobot/robotics-backend -v $(pwd):/home jderobot/robotics-academy```)
 
-4. This will import your local directory inside the docker container, if you have used the example command like above where the location the command is being run is mounted to the home folder inside the docker container you will simply be able to see all the local mounted directories inside the /home of the RADI.
+4. This will import your local directory inside the docker container, if you have used the example command like above where the location the command is being run is mounted to the home folder inside the docker container you will simply be able to see all the local mounted directories inside the /home of the RoboticsBackend.
 
-5. To make sure that your local directory has been mounted correctly to the correct location inside RADI, navigate to http://localhost:1108/vnc.html after launching an exercise(This involves clicking on the launch button of any exercise of your choice) and this will open an vnc console Instance where you may verify the integrity of the mount.
+5. To make sure that your local directory has been mounted correctly to the correct location inside RoboticsBackend, navigate to http://localhost:1108/vnc.html after launching an exercise(This involves clicking on the launch button of any exercise of your choice) and this will open an vnc console Instance where you may verify the integrity of the mount.
 
    ![Screenshot from 2022-08-22 01-31-16](https://user-images.githubusercontent.com/58532023/185808802-3a207cb5-b2df-466f-a7f1-70864ff34206.png)
 
